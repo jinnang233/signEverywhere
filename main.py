@@ -88,4 +88,4 @@ if __name__=="__main__":
             print(valid)
         else:
             print("No such a file")
-
+    app.clear()
