@@ -55,8 +55,8 @@ if __name__=="__main__":
         password, namespace, counter = askPass(password,namespace,counter)
         pk = app.derive(password, namespace, counter)
         del password,namespace,counter
-    if args.showpub:
-        print("Public Key: %s" % (base64.b64encode(pk).decode()))
+        if args.showpub:
+            print("Public Key: %s" % (base64.b64encode(pk).decode()))
 
     if sign_opt and verify_opt:
         print("conflict: you can't use sign flag and verify flag at the same time")
