@@ -47,14 +47,17 @@ if __name__=="__main__":
         namespace = args.namespace
     if args.counter != None:
         counter = args.counter
-    password, namespace, counter = askPass(password,namespace,counter)
-    app = SPHApp()
-    pk = app.derive(password, namespace, counter)
-    del password,namespace,counter
-    if args.showpub:
-        print("Public Key: %s" % (base64.b64encode(pk).decode()))
+
     sign_opt = args.sign
     verify_opt = args.verify
+    app = SPHApp()
+    if sign_opt:
+        password, namespace, counter = askPass(password,namespace,counter)
+        pk = app.derive(password, namespace, counter)
+        del password,namespace,counter
+    if args.showpub:
+        print("Public Key: %s" % (base64.b64encode(pk).decode()))
+
     if sign_opt and verify_opt:
         print("conflict: you can't use sign flag and verify flag at the same time")
         exit()
