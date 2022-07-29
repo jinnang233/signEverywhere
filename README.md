@@ -25,7 +25,7 @@ options:
   -c COUNTER, --counter COUNTER
                         Counter to derive key
   -a ALG, --alg ALG, --algorithm ALG
-                        Algorithm for sphincs
+                        Algorithm of sphincs
 ```
   
   ## Demo
