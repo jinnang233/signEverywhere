@@ -30,7 +30,7 @@ if __name__=="__main__":
     parser.add_argument("--password",help="Password to derive key",dest="password")
     parser.add_argument("--namespace",help="Namespace to derive key",dest="namespace")
     parser.add_argument("-c","--counter",help="Counter to derive key",dest="counter",type=int)
-    parser.add_argument("-a","--alg","--algorithm",help="Algorithm for sphincs",dest="alg",type=str)
+    parser.add_argument("-a","--alg","--algorithm",help="Algorithm of sphincs",dest="alg",type=str)
 
     args = parser.parse_args()
     password, namespace, counter = None,None,None
@@ -50,7 +50,7 @@ if __name__=="__main__":
     if args.alg != None:
         alg_change_result = sphapp.change_alg(args.alg.strip())
         if not alg_change_result:
-            print("Algorithm changed failed, use default algorithm shake_256f")
+            print("Algorithm changed failed, use default algorithm: shake_256f")
             print("Valid algorithms:\n\t{}".format("\n\t".join(sphapp.alglist())))
 
     if not verify_opt:
@@ -61,13 +61,13 @@ if __name__=="__main__":
             print("Public Key: %s" % (base64.b64encode(pk).decode()))
 
     if sign_opt and verify_opt:
-        print("Conflict: you can't use sign flag and verify flag at the same time")
+        print("Conflict: you can't use --sign and --verify at the same time")
         exit()
     if sign_opt and not args.out:
-        print("You must use output parameter")
+        print("Output required")
         exit()
     if verify_opt and ((not args.sig) or (not args.pk)):
-        print("You must use signature and pk parameter")
+        print("Public key and signature required")
         exit()
     if not (sign_opt or verify_opt):
         exit()
