@@ -3,7 +3,7 @@
 You can always have the same secret key and public key by entering same password, namespace and counter. 
 
 ```
-usage: main.py [-h] [-f FILENAME] [-s SIG] [-o OUT] [-p PK] [--showpub] [--sign] [--verify] [--stdin] [--namespace NAMESPACE] [--password PASSWORD] [-c COUNTER]
+usage: main.py [-h] [-f FILENAME] [-s SIG] [-o OUT] [-p PK] [--showpub] [--sign] [--verify] [--stdin] [--password PASSWORD] [--namespace NAMESPACE] [-c COUNTER] [-a ALG]
 
 Sign and verify file or message with SPHINCS
 
@@ -19,12 +19,14 @@ options:
   --sign                Sign
   --verify              Verify
   --stdin               Use stdin
+  --password PASSWORD   Password to derive key
   --namespace NAMESPACE
                         Namespace to derive key
-  --password PASSWORD   Password to derive key
   -c COUNTER, --counter COUNTER
                         Counter to derive key
-  ```
+  -a ALG, --alg ALG, --algorithm ALG
+                        Algorithm for sphincs
+```
   
   ## Demo
   
