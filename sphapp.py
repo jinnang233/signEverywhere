@@ -1,12 +1,23 @@
 import argon2
 import pyspx
-#import pyspx.shake_256f
-import pyspx.shake_256f as spx
 import getpass
 import base64
 import hashlib
 import os
+import re
 
+alg_list = list(filter(lambda a:len(re.findall("[^_]+?\_[^_]+?\.py",a))!=0,os.listdir(pyspx.__path__[0])))
+alg_list = [i.rstrip(".py") for i in alg_list]
+spxload = lambda x: __import__("pyspx.{}".format(x),fromlist=[None])
+spx = spxload("shake_256f")
+def change_alg(name):
+    global spx
+    if name in alg_list:
+        spx = spxload(name)
+        return True
+    return False
+def alglist():
+    return alg_list
 
 class SPHApp():
     def __init__(self):

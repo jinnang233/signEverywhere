@@ -1,3 +1,4 @@
+import sphapp
 from sphapp import SPHApp
 import getpass
 import argparse
@@ -15,14 +16,7 @@ def askPass(password,namespace,counter):
         counter = int(input("Counter:"))
     return password,namespace,counter
 
-
-
-#app = SPHApp()
-#pk = app.derive(password,namespace,counter)
-#del password,namespace,counter
-
 if __name__=="__main__":
-
     parser = argparse.ArgumentParser()
     parser.description="Sign and verify file or message with SPHINCS"
     parser.add_argument("-f","--file",help="File to sign or verify", dest="filename",type=str)
@@ -33,9 +27,10 @@ if __name__=="__main__":
     parser.add_argument("--sign",help="Sign",action="store_true")
     parser.add_argument("--verify",help="Verify",action="store_true")
     parser.add_argument("--stdin",help="Use stdin",action="store_true")
-    parser.add_argument("--namespace",help="Namespace to derive key",dest="namespace")
     parser.add_argument("--password",help="Password to derive key",dest="password")
+    parser.add_argument("--namespace",help="Namespace to derive key",dest="namespace")
     parser.add_argument("-c","--counter",help="Counter to derive key",dest="counter",type=int)
+    parser.add_argument("-a","--alg","--algorithm",help="Algorithm for sphincs",dest="alg",type=str)
 
     args = parser.parse_args()
     password, namespace, counter = None,None,None
@@ -47,11 +42,18 @@ if __name__=="__main__":
         namespace = args.namespace
     if args.counter != None:
         counter = args.counter
-
+    
     sign_opt = args.sign
     verify_opt = args.verify
     app = SPHApp()
-    if sign_opt:
+    
+    if args.alg != None:
+        alg_change_result = sphapp.change_alg(args.alg.strip())
+        if not alg_change_result:
+            print("Algorithm change failed, use default algorithm shake_256f")
+            print("Valid algorithms:\n\t{}".format("\n\t".join(sphapp.alglist())))
+
+    if not verify_opt:
         password, namespace, counter = askPass(password,namespace,counter)
         pk = app.derive(password, namespace, counter)
         del password,namespace,counter
@@ -66,6 +68,8 @@ if __name__=="__main__":
         exit()
     if verify_opt and ((not args.sig) or (not args.pk)):
         print("You must use signature and pk parameter")
+        exit()
+    if not (sign_opt or verify_opt):
         exit()
     if args.stdin:
         content = "".join(sys.stdin.readlines()).encode("utf-8")
@@ -91,4 +95,5 @@ if __name__=="__main__":
             print(valid)
         else:
             print("No such a file")
+    
     app.clear()
