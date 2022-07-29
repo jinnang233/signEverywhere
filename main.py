@@ -50,7 +50,7 @@ if __name__=="__main__":
     if args.alg != None:
         alg_change_result = sphapp.change_alg(args.alg.strip())
         if not alg_change_result:
-            print("Algorithm change failed, use default algorithm shake_256f")
+            print("Algorithm changed failed, use default algorithm shake_256f")
             print("Valid algorithms:\n\t{}".format("\n\t".join(sphapp.alglist())))
 
     if not verify_opt:
@@ -61,7 +61,7 @@ if __name__=="__main__":
             print("Public Key: %s" % (base64.b64encode(pk).decode()))
 
     if sign_opt and verify_opt:
-        print("conflict: you can't use sign flag and verify flag at the same time")
+        print("Conflict: you can't use sign flag and verify flag at the same time")
         exit()
     if sign_opt and not args.out:
         print("You must use output parameter")
