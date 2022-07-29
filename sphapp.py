@@ -1,6 +1,7 @@
 import argon2
 import pyspx
-import pyspx.shake_256f
+#import pyspx.shake_256f
+import pyspx.shake_256f as spx
 import getpass
 import base64
 import hashlib
@@ -15,17 +16,17 @@ class SPHApp():
         pass_salt = argon2.argon2_hash(
             password,
             salt=hashlib.sha512(("%s%d" % (namespace,counter)).encode()).digest(),
-            buflen=96)
-        pk,sk = pyspx.shake_256f.generate_keypair(pass_salt)
+            buflen=spx.crypto_sign_SEEDBYTES)
+        pk,sk = spx.generate_keypair(pass_salt)
         self.pk = pk
         self.sk = sk
         return pk
     def sign(self,msg):
         if not self.sk:
             return None
-        return pyspx.shake_256f.sign(msg,self.sk)
+        return spx.sign(msg,self.sk)
     def verify(self,msg,sig,pk):
-        return pyspx.shake_256f.verify(msg,sig,pk)
+        return spx.verify(msg,sig,pk)
     def fileHash(filename):
         if not SPHApp.isValid(filename):
             return None
