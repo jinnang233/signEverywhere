@@ -10,19 +10,21 @@ alg_list = list(filter(lambda a:len(re.findall("[^_]+?\_[^_]+?\.py",a))!=0,os.li
 alg_list = [i.rstrip(".py") for i in alg_list]
 spxload = lambda x: __import__("pyspx.{}".format(x),fromlist=[None])
 spx = spxload("shake_256f")
-def change_alg(name):
-    global spx
-    if name in alg_list:
-        spx = spxload(name)
-        return True
-    return False
-def alglist():
-    return alg_list
+
 
 class SPHApp():
     def __init__(self):
         self.pk = None
         self.sk = None
+    def change_alg(name):
+        global spx
+        if name in alg_list:
+            spx = spxload(name)
+            return True
+        return False
+    def alglist():
+        global alg_list
+        return alg_list
     def derive(self,password:str, namespace:str, counter:int):
         pass_salt = argon2.argon2_hash(
             password,
@@ -32,6 +34,10 @@ class SPHApp():
         self.pk = pk
         self.sk = sk
         return pk
+    def PK_pretest(pk):
+        if len(pk) != spx.crypto_sign_PUBLICKEYBYTES:
+            return False
+        return True
     def sign(self,msg):
         if not self.sk:
             return None
