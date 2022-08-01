@@ -58,12 +58,13 @@ if __name__=="__main__":
         password, namespace, counter = askPass(password,namespace,counter)
         pk = app.derive(password, namespace, counter)
         del password,namespace,counter
+        output_pk = (binascii.hexlify(pk) if args.hex else base64.b64encode(pk)).decode()
         if args.showpub:
-            print("Public Key: %s" % (binascii.hexlify(pk) if args.hex else base64.b64encode(pk)).decode())
+            print("Public Key: %s" % output_pk)
         if args.qrcode:
             try:
                 qrcode = __import__("qrcode")
-                qrcode.make(pk).show()
+                qrcode.make(output_pk).show()
             except ImportError:
                 print("No qrcode library. Please run: pip install qrcode .")
     if sign_opt and verify_opt:
