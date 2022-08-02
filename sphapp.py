@@ -6,6 +6,7 @@ import hashlib
 import os
 import re
 
+# Getting hash methods by filtering library path
 alg_list = list(filter(lambda a:len(re.findall("[^_]+?\_[^_]+?\.py",a))!=0,os.listdir(pyspx.__path__[0])))
 alg_list = [i.rstrip(".py") for i in alg_list]
 spxload = lambda x: __import__("pyspx.{}".format(x),fromlist=[None])
@@ -71,7 +72,8 @@ class SPHApp():
         signature = f_signature.read()
         return self.verify(file_hash,signature, pk)
     def clear(self):
-        self.__init__()
+        self.sk = None
+        self.pk = None
     def isValid(filename):
         valid = True
         if not os.path.exists(filename):
