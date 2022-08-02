@@ -104,7 +104,7 @@ if __name__=="__main__":
     key_group.add_argument("--password",help="Password to derive key",dest="password")
     key_group.add_argument("--namespace",help="Namespace to derive key",dest="namespace")
     key_group.add_argument("-c","--counter",help="Counter to derive key",dest="counter",type=int)
-    key_group.add_argument("-a","--alg","--algorithm",help="Algorithm of sphincs [Default: shake_256f]",choices=SPHApp.alglist(),dest="alg",type=str,default="shake_256f")
+    key_group.add_argument("-a","--alg","--algorithm",help="Algorithm of sphincs [Default: {}]".format(SPHApp.get_default_alg()),choices=SPHApp.alglist(),dest="alg",type=str,default="shake_256f")
     args = parser.parse_args()
 
     alg_change_result = SPHApp.change_alg(args.alg.strip())

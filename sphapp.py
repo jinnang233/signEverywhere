@@ -10,7 +10,8 @@ import re
 alg_list = list(filter(lambda a:len(re.findall("[^_]+?\_[^_]+?\.py",a))!=0,os.listdir(pyspx.__path__[0])))
 alg_list = [i.rstrip(".py") for i in alg_list]
 spxload = lambda x: __import__("pyspx.{}".format(x),fromlist=[None])
-spx = spxload("shake_256f")
+default_alg = "shake_256f" if "shake_256f" in alg_list else alg_list[0]
+spx = spxload(default_alg)
 
 
 class SPHApp():
@@ -26,6 +27,9 @@ class SPHApp():
     def alglist():
         global alg_list
         return alg_list
+    def get_default_alg():
+        global default_alg
+        return default_alg
     def derive(self,password:str, namespace:str, counter:int):
         pass_salt = argon2.argon2_hash(
             password,
