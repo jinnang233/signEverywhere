@@ -44,24 +44,32 @@ class SPHApp():
         return spx.sign(msg,self.sk)
     def verify(self,msg,sig,pk):
         return spx.verify(msg,sig,pk)
+    def ioHash(f):
+        hasher = hashlib.sha512()
+        while True:
+            block = f.read(4096)
+            if not block:
+                break
+            hasher.update(block)
+        return hasher.digest()
     def fileHash(filename):
         if not SPHApp.isValid(filename):
             return None
-        hasher = hashlib.sha512()
         with open(filename,"rb") as f:
-            while True:
-                block = f.read(4096)
-                if not block:
-                    break
-                hasher.update(block)
-        return hasher.digest()
+            return SPHApp.ioHash(f)
     def sign_file(self,filename):
         file_hash = SPHApp.fileHash(filename)
         return self.sign(file_hash)
+    def sign_io(self,f):
+        io_hash = SPHApp.ioHash(f)
+        return self.sign(io_hash)
     def verify_file(self,filename, signature,pk):
         file_hash = SPHApp.fileHash(filename)
         return self.verify(file_hash,signature,pk)
-            
+    def verify_io(self,f_file,f_signature, pk):
+        file_hash = SPHApp.ioHash(f_file)
+        signature = f_signature.read()
+        return self.verify(file_hash,signature, pk)
     def clear(self):
         self.__init__()
     def isValid(filename):

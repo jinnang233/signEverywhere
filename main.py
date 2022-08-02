@@ -17,23 +17,33 @@ def askPass(password,namespace,counter):
     return password,namespace,counter
 
 if __name__=="__main__":
+    encoding_dict={"base64":base64.b64encode,"base32":base64.b32encode,"hex":binascii.hexlify}
+    decoding_dict = {"base64":base64.b64decode,"base32":base64.b32decode,"hex":binascii.unhexlify}
     parser = argparse.ArgumentParser()
     parser.description="Sign and verify file or message with SPHINCS"
-    parser.add_argument("-f","--file",help="File to sign or verify", dest="filename",type=str)
-    parser.add_argument("-s","--signature",help="Signature file",dest="sig",type=str)
-    parser.add_argument("-o","--output",help="Output file",dest="out",type=str)
-    parser.add_argument("-p","--pubkey",help="Public key",dest="pk",type=str)
-    parser.add_argument("--hex","--hexlify",help="Output hex public key", dest="hex",action="store_true")
-    parser.add_argument("--b64","--base64",help="Output base64 public key", dest="hex",action="store_false")
-    parser.add_argument("--showpub",help="Show public key",action="store_true")
-    parser.add_argument("--qr","--qrcode",help="Output qrcode",dest="qrcode",action="store_true")
-    parser.add_argument("--sign",help="Sign",action="store_true")
-    parser.add_argument("--verify",help="Verify",action="store_true")
-    parser.add_argument("--stdin",help="Use stdin",action="store_true")
-    parser.add_argument("--password",help="Password to derive key",dest="password")
-    parser.add_argument("--namespace",help="Namespace to derive key",dest="namespace")
-    parser.add_argument("-c","--counter",help="Counter to derive key",dest="counter",type=int)
-    parser.add_argument("-a","--alg","--algorithm",help="Algorithm of sphincs [Default: shake_256f]",dest="alg",type=str)
+    operation_group = parser.add_mutually_exclusive_group(required=False)
+    sign_parser = parser.add_subparsers("--sign",help="Sign",action="store_true")
+    verifier_parser = parser.add_subparsers("--verify",help="Verify",action="store_true")
+
+    subparsers = parser.add_subparsers()
+    
+    parser.add_argument("-f","--file",help="File to sign or verify", dest="infile",nargs="?",type=argparse.FileType("rb"),default=sys.stdin)
+    sign_group = sign_parser.add_argument_group("Sign group")
+    sign_group.add_argument("-o","--output",help="Output file",dest="out",nargs="?",type=argparse.FileType("wb",0),default=sys.stdout)
+
+    verify_group = verifier_parser.add_argument_group("Verify group")
+    verify_group.add_argument("-s","--signature",help="Signature file",dest="sig",type=argparse.FileType("rb"))
+
+    verify_group.add_argument("-p","--pubkey",help="Public key",dest="pk",type=str)
+
+    key_group = parser.add_argument_group("Key group")
+    key_group.add_argument("--encoding",help="Choose encoding of public key",choices=["base64","hex","base32"],default="base64",dest="encoding")
+    key_group.add_argument("--showpub",help="Show public key",action="store_true")
+    key_group.add_argument("--qr","--qrcode",help="Output qrcode",dest="qrcode",action="store_true")
+    key_group.add_argument("--password",help="Password to derive key",dest="password")
+    key_group.add_argument("--namespace",help="Namespace to derive key",dest="namespace")
+    key_group.add_argument("-c","--counter",help="Counter to derive key",dest="counter",type=int)
+    key_group.add_argument("-a","--alg","--algorithm",help="Algorithm of sphincs [Default: shake_256f]",dest="alg",type=str,default="shake_256f")
     args = parser.parse_args()
     sign_opt = args.sign
     verify_opt = args.verify
@@ -58,7 +68,8 @@ if __name__=="__main__":
         password, namespace, counter = askPass(password,namespace,counter)
         pk = app.derive(password, namespace, counter)
         del password,namespace,counter
-        output_pk = (binascii.hexlify(pk) if args.hex else base64.b64encode(pk)).decode()
+        output_pk = encoding_dict[args.encoding](pk).decode()
+        #output_pk = (binascii.hexlify(pk) if args.hex else base64.b64encode(pk)).decode()
         if args.showpub:
             print("Public Key: %s" % output_pk)
         if args.qrcode:
@@ -67,9 +78,6 @@ if __name__=="__main__":
                 qrcode.make(output_pk).show()
             except ImportError:
                 print("No qrcode library. Please run: pip install qrcode .")
-    if sign_opt and verify_opt:
-        print("Conflict: you can't use --sign and --verify at the same time")
-        sys.exit()
     if sign_opt and not args.out:
         print("Output required")
         sys.exit()
@@ -78,33 +86,24 @@ if __name__=="__main__":
         sys.exit()
     if not (sign_opt or verify_opt):
         sys.exit()
-    if args.stdin:
-        content = "".join(sys.stdin.readlines()).encode("utf-8")
-    else:
-        if not args.filename:
-            print("No filename!")
-            sys.exit()
-        if not SPHApp.isValid(args.filename):
-            print("No such a file")
-            sys.exit()
-        filename = args.filename
+    if not args.infile or not args.out:
+        print("No infile!")
+        sys.exit()
+    file = args.infile
     if sign_opt:
-        sig = app.sign(content) if args.stdin else app.sign_file(filename)
-        with open(args.out,"wb") as f:
-            f.write(sig)
+        sig = app.sign_io(file)
+        with args.out as f:
+            if args.out.mode=="w":
+                f.write(base64.b64encode(sig).decode())
+            else:
+                f.write(sig)
     elif verify_opt:
-        destpk = binascii.unhexlify(args.pk) if args.hex else base64.b64decode(args.pk)
+        destpk = decoding_dict[args.encoding](args.pk)
         if not SPHApp.PK_pretest(destpk):
             print("Invalid PK")
             sys.exit()
-
-        if SPHApp.isValid(args.sig):
-            with open(args.sig,"rb") as f:
-                sig = f.read()
-            valid = app.verify(content,sig,destpk) if args.stdin else app.verify_file(filename,sig,destpk)
-            valid = "Valid" if valid else "Invalid"
-            print(valid)
-        else:
-            print("No such a file")
+        valid = app.verify_io(file,args.sig,destpk)
+        valid = "Valid" if valid else "Invalid"
+        print(valid)
     
     app.clear()
