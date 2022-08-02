@@ -53,7 +53,7 @@ def derivePK(args,app):
                 qrcode = __import__("qrcode")
                 qrcode.make(output_pk).show()
             except ImportError:
-                print("No qrcode library. Please run: pip install qrcode .")
+                print("No qrcode library. Please run: pip install Image qrcode .")
         return pk
 
 def sign_func(args):
