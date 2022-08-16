@@ -30,12 +30,22 @@ class SPHApp():
     def get_default_alg():
         global default_alg
         return default_alg
-    def derive(self,password:str, namespace:str, counter:int):
+    def derive(self,password:str, namespace:str, counter:int, return_seed:bool=False):
         pass_salt = argon2.argon2_hash(
             password,
             salt=hashlib.sha512(("%s%d" % (namespace,counter)).encode()).digest(),
             buflen=spx.crypto_sign_SEEDBYTES)
         pk,sk = spx.generate_keypair(pass_salt)
+        self.pk = pk
+        self.sk = sk
+        if return_seed:
+            return pass_salt
+        else:
+            return pk
+    def derive_seed(self,seed):
+        if len(seed) != spx.crypto_sign_SEEDBYTES:
+            return None
+        pk,sk = spx.generate_keypair(seed)
         self.pk = pk
         self.sk = sk
         return pk
