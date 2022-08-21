@@ -9,12 +9,8 @@ import locale
 import pkg_resources
 # Multi language support
 loc = locale.getlocale()
-#gettext.bindtextdomain("resources","langs")
-#gettext.textdomain("resources")
 get_lang = lambda lc, localedir:gettext.translation(lc,localedir=localedir,languages=[lc.replace("_","-")],fallback=False)
 locale_path = pkg_resources.resource_filename("signEverywhere","locales")
-
-#lang = gettext.translation(loc[0],localedir="langs",languages=[loc[0].replace("_","-")],fallback=False)
 lang = get_lang(loc[0],locale_path)
 lang.install()
 _ = lang.gettext
