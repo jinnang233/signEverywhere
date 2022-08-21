@@ -19,13 +19,13 @@ usage: signEverywhere.py [-h] [--encoding {base64,hex,base32}] [--showpub] [--sh
   
   #### Sign
   ```bash
-	SPassword="password" SNamespace="namespace" SCounter="1" python3 -m  signEverywhere --showpub sign -f ~/test/test -o ~/test/test.sig 
+	SPassword="password" SNamespace="namespace" SCounter="1" python3 -m  signEverywhere.cli --showpub sign -f ~/test/test -o ~/test/test.sig 
 	# Public Key: FSEMpYYohOfTIDkfSaKQro9D6xy7/yC21jZHglMDaKl1hTF6vJcADdrnByI/S6aR4EJVXKSYHv9wNyVzHlAaEg==
   ```
   
   #### Verify
   ```bash
-	python3 -m signEverywhere verify -f ~/test/test -s ~/test/test.sig -p FSEMpYYohOfTIDkfSaKQro9D6xy7/yC21jZHglMDaKl1hTF6vJcADdrnByI/S6aR4EJVXKSYHv9wNyVzHlAaEg==
+	python3 -m signEverywhere.cli verify -f ~/test/test -s ~/test/test.sig -p FSEMpYYohOfTIDkfSaKQro9D6xy7/yC21jZHglMDaKl1hTF6vJcADdrnByI/S6aR4EJVXKSYHv9wNyVzHlAaEg==
 	#Valid
 
   ```
