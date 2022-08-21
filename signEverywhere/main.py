@@ -1,4 +1,4 @@
-from sphapp import SPHApp
+from signEverywhere.sphapp import SPHApp
 import getpass
 import argparse
 import os,sys
@@ -6,13 +6,16 @@ import base64
 import binascii
 import gettext
 import locale
-
+import pkg_resources
 # Multi language support
 loc = locale.getlocale()
-gettext.bindtextdomain("resources","langs")
-gettext.textdomain("resources")
+#gettext.bindtextdomain("resources","langs")
+#gettext.textdomain("resources")
+get_lang = lambda lc, localedir:gettext.translation(lc,localedir=localedir,languages=[lc.replace("_","-")],fallback=False)
+locale_path = pkg_resources.resource_filename("signEverywhere","locales")
 
-lang = gettext.translation(loc[0],localedir="langs",languages=[loc[0].replace("_","-")],fallback=False)
+#lang = gettext.translation(loc[0],localedir="langs",languages=[loc[0].replace("_","-")],fallback=False)
+lang = get_lang(loc[0],locale_path)
 lang.install()
 _ = lang.gettext
 
@@ -127,7 +130,7 @@ def verify_func(args):
     print(valid)
 def default_func(args):
     pk = derivePK(args,app)
-if __name__=="__main__":
+def main():
     parser = argparse.ArgumentParser()
     parser.description=_("sign or verify file with SPHINCS+. An unofficial frontend of PySPX library.")
     parser.set_defaults(func=default_func)

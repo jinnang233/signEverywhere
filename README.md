@@ -2,6 +2,12 @@
 
 You can always have the same secret key and public key by entering same password, namespace and counter. 
 
+## Installation
+```bash
+$ git clone https://github.com/jinnang233/signEverywhere && cd signEverywhere
+$ python3 setup.py install
+```
+
 ## Usage
 ```
 usage: signEverywhere.py [-h] [--encoding {base64,hex,base32}] [--showpub] [--showseed] [--qr] [--password PASSWORD] [--namespace NAMESPACE] [--seed SEED] [-c COUNTER]
@@ -13,13 +19,13 @@ usage: signEverywhere.py [-h] [--encoding {base64,hex,base32}] [--showpub] [--sh
   
   #### Sign
   ```bash
-	SPassword="password" SNamespace="namespace" SCounter="1" python3 signEverywhere.py --showpub sign -f ~/test/test -o ~/test/test.sig 
+	SPassword="password" SNamespace="namespace" SCounter="1" python3 -m  signEverywhere --showpub sign -f ~/test/test -o ~/test/test.sig 
 	# Public Key: FSEMpYYohOfTIDkfSaKQro9D6xy7/yC21jZHglMDaKl1hTF6vJcADdrnByI/S6aR4EJVXKSYHv9wNyVzHlAaEg==
   ```
   
   #### Verify
   ```bash
-	python3 signEverywhere.py verify -f ~/test/test -s ~/test/test.sig -p FSEMpYYohOfTIDkfSaKQro9D6xy7/yC21jZHglMDaKl1hTF6vJcADdrnByI/S6aR4EJVXKSYHv9wNyVzHlAaEg==
+	python3 -m signEverywhere verify -f ~/test/test -s ~/test/test.sig -p FSEMpYYohOfTIDkfSaKQro9D6xy7/yC21jZHglMDaKl1hTF6vJcADdrnByI/S6aR4EJVXKSYHv9wNyVzHlAaEg==
 	#Valid
 
   ```
