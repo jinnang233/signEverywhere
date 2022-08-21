@@ -4,11 +4,24 @@ import argparse
 import os,sys
 import base64
 import binascii
+import gettext
+import locale
 
+# Multi language support
+loc = locale.getlocale()
+gettext.bindtextdomain("resources","langs")
+gettext.textdomain("resources")
+
+lang = gettext.translation(loc[0],localedir="langs",languages=[loc[0].replace("_","-")],fallback=False)
+lang.install()
+_ = lang.gettext
+
+# Environment vars
 password_environ_name="SPassword"
 namespace_environ_name="SNamespace"
 counter_environ_name="SCounter"
 
+# Initializing
 app = SPHApp()
 encoding_dict={"base64":base64.b64encode,"base32":base64.b32encode,"hex":binascii.hexlify}
 decoding_dict = {"base64":base64.b64decode,"base32":base64.b32decode,"hex":binascii.unhexlify}
@@ -16,11 +29,11 @@ decoding_dict = {"base64":base64.b64decode,"base32":base64.b32decode,"hex":binas
 # Ask password
 def askPass(password,namespace,counter):
     if not password:
-        password = getpass.getpass()
+        password = getpass.getpass(_("Password:"))
     if not namespace:
-        namespace = input("Namespace:")
+        namespace = input(_("Namespace:"))
     if not counter:
-        counter = int(input("Counter:"))
+        counter = int(input(_("Counter:")))
     return password,namespace,counter
 
 # Get password,namespace, counter from environment var
@@ -65,18 +78,18 @@ def derivePK(args,app):
         
         output_pk = encoding_dict[args.encoding](pk).decode()
         if args.showpub:
-            print("Public Key: %s" % output_pk)
+            print(_("Public Key:") +  "%s" % output_pk)
         if args.showseed:
             seed = app.derive(password,namespace, counter,return_seed=True)
             output_seed = encoding_dict[args.encoding](seed).decode()
-            print("Keypair seed: %s" % output_seed)
+            print(_("Keypair seed: ") + "%s" % output_seed)
         del password,namespace,counter
         if args.qrcode:
             try:
                 qrcode = __import__("qrcode")
                 qrcode.make(output_pk).show()
             except ImportError:
-                print("No qrcode library. Please run: pip install Image qrcode .")
+                print(_("No qrcode library. Please run: pip install Image qrcode ."))
         return pk
 
 
@@ -104,46 +117,46 @@ def verify_func(args):
     if destpk == None:
         key_validation = False
     if not key_validation:
-        print("Invalid PK")
+        print(_("Invalid PK"))
         sys.exit()
     if file is None:
         return
     
     valid = app.verify_io(file,args.sig,destpk)
-    valid = "Valid" if valid else "Invalid"
+    valid = _("Valid") if valid else _("Invalid")
     print(valid)
 def default_func(args):
     pk = derivePK(args,app)
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
-    parser.description="Sign and verify file with SPHINCS+. An unofficial frontend of PySPX library."
+    parser.description=_("sign or verify file with SPHINCS+. An unofficial frontend of PySPX library.")
     parser.set_defaults(func=default_func)
 
     subparsers = parser.add_subparsers(dest="subparser_name")
 
-    sign_parser = subparsers.add_parser("sign",help="Sign")
-    verifier_parser = subparsers.add_parser("verify",help="Verify")
+    sign_parser = subparsers.add_parser("sign",help=_("Sign"))
+    verifier_parser = subparsers.add_parser("verify",help=_("Verify"))
 
     sign_parser.set_defaults(func=sign_func)
     verifier_parser.set_defaults(func=verify_func)
 
-    sign_parser.add_argument("-f","--file",metavar="filename",help="File to sign or verify", dest="infile",nargs="?",type=argparse.FileType("rb"),default=sys.stdin,required=True)
-    sign_parser.add_argument("-o","--output",metavar="output_file",help="Output file",dest="out",nargs="?",type=argparse.FileType("wb",0),default=sys.stdout,required=False)
+    sign_parser.add_argument("-f","--file",metavar="filename",help=_("file to be signed or verified"), dest="infile",nargs="?",type=argparse.FileType("rb"),default=sys.stdin,required=True)
+    sign_parser.add_argument("-o","--output",metavar="output_file",help=_("output file"),dest="out",nargs="?",type=argparse.FileType("wb",0),default=sys.stdout,required=False)
 
-    verifier_parser.add_argument("-f","--file",metavar="filename",help="File to sign or verify", dest="infile",nargs="?",type=argparse.FileType("rb"),default=sys.stdin,required=True)
-    verifier_parser.add_argument("-s","--signature",metavar="signature_file",help="Signature file",dest="sig",type=argparse.FileType("rb"),required=True)
-    verifier_parser.add_argument("-p","--pubkey",metavar="public_key_string",help="Public key",dest="pk",type=str,required=True)
+    verifier_parser.add_argument("-f","--file",metavar="filename",help=_("file to be signed or verified"), dest="infile",nargs="?",type=argparse.FileType("rb"),default=sys.stdin,required=True)
+    verifier_parser.add_argument("-s","--signature",metavar="signature_file",help=_("signature file"),dest="sig",type=argparse.FileType("rb"),required=True)
+    verifier_parser.add_argument("-p","--pubkey",metavar="public_key_string",help=_("public key"),dest="pk",type=str,required=True)
 
     key_group = parser.add_argument_group("Key group")
-    key_group.add_argument("--encoding",help="Choose encoding of public key",choices=["base64","hex","base32"],default="base64",dest="encoding")
-    key_group.add_argument("--showpub",help="Show public key",action="store_true")
-    key_group.add_argument("--showseed",help="Show seed of keypair",action="store_true")
-    key_group.add_argument("--qr","--qrcode",help="Output qrcode",dest="qrcode",action="store_true")
-    key_group.add_argument("--password",help="Password to derive key",dest="password")
-    key_group.add_argument("--namespace",help="Namespace to derive key",dest="namespace")
-    key_group.add_argument("--seed",help="Seed to derive key",dest="seed")
-    key_group.add_argument("-c","--counter",help="Counter to derive key",dest="counter",type=int)
-    key_group.add_argument("-a","--alg","--algorithm",help="Algorithm of sphincs [Default: {}]".format(SPHApp.get_default_alg()),choices=SPHApp.alglist(),dest="alg",type=str,default=SPHApp.get_default_alg())
+    key_group.add_argument("--encoding",help=_("encoding of public key"),choices=["base64","hex","base32"],default="base64",dest="encoding")
+    key_group.add_argument("--showpub",help=_("show public key"),action="store_true")
+    key_group.add_argument("--showseed",help=_("show seed of keypair"),action="store_true")
+    key_group.add_argument("--qr","--qrcode",help=_("show qrcode"),dest="qrcode",action="store_true")
+    key_group.add_argument("--password",help=_("password to derive key"),dest="password")
+    key_group.add_argument("--namespace",help=_("namespace to derive key"),dest="namespace")
+    key_group.add_argument("--seed",help=_("seed to derive key"),dest="seed")
+    key_group.add_argument("-c","--counter",help=_("counter to derive key"),dest="counter",type=int)
+    key_group.add_argument("-a","--alg","--algorithm",help=_("algorithm of sphincs [Default: {}]").format(SPHApp.get_default_alg()),choices=SPHApp.alglist(),dest="alg",type=str,default=SPHApp.get_default_alg())
     args = parser.parse_args()
 
     alg_change_result = SPHApp.change_alg(args.alg.strip())
