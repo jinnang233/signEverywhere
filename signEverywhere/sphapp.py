@@ -5,7 +5,9 @@ import base64
 import hashlib
 import os
 import re
-
+import json
+import asyncio
+from kademlia.network import Server
 # Getting hash methods by filtering library path
 alg_list = list(filter(lambda a:len(re.findall("[^_]+?\_[^_]+?\.py",a))!=0,os.listdir(pyspx.__path__[0])))
 alg_list = [i.rstrip(".py") for i in alg_list]
@@ -18,6 +20,47 @@ class SPHApp():
     def __init__(self):
         self.pk = None
         self.sk = None
+        self.server = Server()
+    async def server_run(self,bootstrap_nodes):
+        await self.server.listen(8470)
+        await self.server.bootstrap(bootstrap_nodes)
+    async def server_get_value(self,key):
+        value = await self.server.get(key)
+        return value
+    async def server_set_value(self,key,value):
+        await self.server.set(key,value)
+        
+    def __del__(self):
+        self.server.stop()
+    
+    def run(self,bootstrap_nodes):
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(self.server_run(bootstrap_nodes))
+    def set_value(self,key,value):
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(self.server_set_value(key,value))
+    def get_value(self,key):
+        loop = asyncio.get_event_loop()
+        get_future = asyncio.ensure_future(self.server_get_value(key))
+        loop.run_until_complete(get_future)
+        return get_future.result()
+    def get_fingerprint(self,key_bundle):
+        return hashlib.sha512(json.dumps(key_bundle).encode("utf-8")).hexdigest()
+    def get_pkey_id(self,key_bundle):
+        return hashlib.sha1(json.dumps(key_bundle).encode("utf-8")).hexdigest()
+    def store_pkey(self,key_bundle):
+        pkey_id = self.get_pkey_id(key_bundle)
+        fingerprint = self.get_fingerprint(key_bundle)
+        self.set_value(pkey_id, json.dumps(key_bundle))
+        return pkey_id, fingerprint
+    def get_pkey(self,pkey_id):
+        key_bundle = json.loads(self.get_value(pkey_id))
+        fingerprint = self.get_fingerprint(key_bundle)
+        return key_bundle, fingerprint
+    def make_key_bundle(self,pkey,alg,name):
+        return {"pkey":base64.b64encode(pkey).decode(),"alg":alg}
+
+
     def change_alg(name):
         global spx
         if name in alg_list:

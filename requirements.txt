@@ -2,3 +2,4 @@ argon2==0.1.10
 cffi==1.15.1
 pycparser==2.21
 PySPX>=0.4.0
+kademlia
