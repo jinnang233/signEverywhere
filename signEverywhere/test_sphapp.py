@@ -9,7 +9,7 @@ class TestSignEverywhere:
     def test_server_dht(self):
         app = sphapp.SPHApp()
         node_list = [("127.0.0.1",8468)]
-        app.run(node_list)
+        app.run(node_list,False,9053)
         num = random.randint(1,100)
         key = "test_uuid_" + str(uuid.uuid1().int)
         app.set_value(key,num)

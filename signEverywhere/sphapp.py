@@ -21,8 +21,8 @@ class SPHApp():
         self.pk = None
         self.sk = None
         self.server = Server()
-    async def server_run(self,bootstrap_nodes):
-        await self.server.listen(8470)
+    async def server_run(self,bootstrap_nodes,port=8470):
+        await self.server.listen(port)
         await self.server.bootstrap(bootstrap_nodes)
     async def server_get_value(self,key):
         value = await self.server.get(key)
@@ -33,9 +33,17 @@ class SPHApp():
     def __del__(self):
         self.server.stop()
     
-    def run(self,bootstrap_nodes):
+    def run(self,bootstrap_nodes,runForever=False,port=8470):
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(self.server_run(bootstrap_nodes))
+        loop.run_until_complete(self.server_run(bootstrap_nodes,port))
+        if runForever:
+            try:
+                loop.run_forever()
+            except KeyboardInterrupt:
+                pass
+            finally:
+                self.server.stop()
+                loop.close()
     def set_value(self,key,value):
         loop = asyncio.get_event_loop()
         loop.run_until_complete(self.server_set_value(key,value))
@@ -45,9 +53,9 @@ class SPHApp():
         loop.run_until_complete(get_future)
         return get_future.result()
     def get_fingerprint(self,key_bundle):
-        return hashlib.sha512(json.dumps(key_bundle).encode("utf-8")).hexdigest()
+        return hashlib.sha512(json.dumps(key_bundle).encode("utf-8")).hexdigest().upper()
     def get_pkey_id(self,key_bundle):
-        return hashlib.sha1(json.dumps(key_bundle).encode("utf-8")).hexdigest()
+        return hashlib.sha1(json.dumps(key_bundle).encode("utf-8")).hexdigest().upper()
     def store_pkey(self,key_bundle):
         pkey_id = self.get_pkey_id(key_bundle)
         fingerprint = self.get_fingerprint(key_bundle)
@@ -58,7 +66,7 @@ class SPHApp():
         fingerprint = self.get_fingerprint(key_bundle)
         return key_bundle, fingerprint
     def make_key_bundle(self,pkey,alg,name):
-        return {"pkey":base64.b64encode(pkey).decode(),"alg":alg}
+        return {"pkey":base64.b64encode(pkey).decode(),"alg":alg,"name":name}
 
 
     def change_alg(name):
