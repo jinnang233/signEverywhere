@@ -1,6 +1,6 @@
 import argparse
 import base64
-from sphapp import SPHApp
+from signEverywhere.sphapp import SPHApp
 
 def default_func(args, app):
     pk = derive(args, app)
