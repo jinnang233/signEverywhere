@@ -1,31 +1,70 @@
 # signEverywhere
 
-You can always have the same secret key and public key by entering same password, namespace and counter. 
+signEverywhere is a command-line tool for signing and verifying files using the SPHINCS+ signature scheme. It is an unofficial frontend for the PySPX library.
 
 ## Installation
-```bash
-$ git clone https://github.com/jinnang233/signEverywhere && cd signEverywhere
-$ python3 setup.py install
-```
+
+1. Clone the signEverywhere repository:
+
+git clone https://github.com/your-username/signEverywhere.git
+
+
+2. Install the signEverywhere:
+
+pip install -r requirements.txt
+python setup.py install
+
 
 ## Usage
-```
-usage: signEverywhere.py [-h] [--encoding {base64,hex,base32}] [--showpub] [--showseed] [--qr] [--password PASSWORD] [--namespace NAMESPACE] [--seed SEED] [-c COUNTER]
-                         [-a {sha2_256f,haraka_128s,shake_256f,sha2_192s,shake_192s,sha2_128f,shake_256s,sha2_128s,sha2_256s,shake_128s,haraka_128f,haraka_256f,sha2_192f,haraka_192f,shake_128f,haraka_256s,haraka_192s,shake_192f}]
-                         {sign,verify} ...
-```
-  
-  ## Demo
-  
-  #### Sign
-  ```bash
-	SPassword="password" SNamespace="namespace" SCounter="1" python3 -m  signEverywhere.cli --showpub sign -f ~/test/test -o ~/test/test.sig 
-	# Public Key: FSEMpYYohOfTIDkfSaKQro9D6xy7/yC21jZHglMDaKl1hTF6vJcADdrnByI/S6aR4EJVXKSYHv9wNyVzHlAaEg==
-  ```
-  
-  #### Verify
-  ```bash
-	python3 -m signEverywhere.cli verify -f ~/test/test -s ~/test/test.sig -p FSEMpYYohOfTIDkfSaKQro9D6xy7/yC21jZHglMDaKl1hTF6vJcADdrnByI/S6aR4EJVXKSYHv9wNyVzHlAaEg==
-	#Valid
 
-  ```
+```
+sign_everywhere [command] [options]
+```
+
+### Commands
+
+- `sign`: Sign a file with a private key.
+- `verify`: Verify the signature of a file.
+
+### Options
+
+- `infile`: Input file to be signed or verified.
+- `--out`: Output file for the signed file (only applicable for the `sign` command).
+- `--password`: Password for the private key (required for the `sign` command).
+- `--namespace`: Namespace for key derivation (default: "default_namespace").
+- `--counter`: Counter for key derivation (default: 0).
+- `--showpk`: Show the public key after signing (only applicable for the `sign` command).
+- `--algorithm`: Specify the SPHINCS+ algorithm to use (default: "default_algorithm").
+- `--bootstrap`: Bootstrap nodes for the Kademlia network (required for the `run` command).
+- `--port`: Port number for the Kademlia network (default: 8470).
+- `--run-forever`: Keep the Kademlia server running indefinitely (only applicable for the `run` command).
+
+### Examples
+
+- Sign a file:
+
+```
+python main.py sign infile.txt --out signed_file.txt --password mypassword
+```
+
+
+- Verify the signature of a file:
+```
+python main.py verify infile.txt signature.txt public_key
+```
+
+
+- Run the Key server:
+```
+python main.py  --bootstrap node1 node2 node3 [options]
+```
+
+
+
+## Contributing
+
+Contributions are welcome! If you find any issues or have suggestions for improvements, please open an issue or submit a pull request.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
