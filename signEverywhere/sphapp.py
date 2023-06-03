@@ -9,6 +9,14 @@ import json
 import asyncio
 from kademlia.network import Server
 
+# 获取算法列表
+alg_list = list(filter(lambda a: len(re.findall("[^_]+?\_[^_]+?\.py", a)) != 0, os.listdir(pyspx.__path__[0])))
+alg_list = [i.rstrip(".py") for i in alg_list]
+
+# 根据默认算法加载 spx 模块
+default_alg = "shake_256f" if "shake_256f" in alg_list else alg_list[0]
+spx = __import__("pyspx.{}".format(default_alg), fromlist=[None])
+
 class SPHApp():
     def __init__(self):
         self.pk = None
