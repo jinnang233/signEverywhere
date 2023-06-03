@@ -16,13 +16,13 @@ alg_list = [i.rstrip(".py") for i in alg_list]
 # 根据默认算法加载 spx 模块
 default_alg = "shake_256f" if "shake_256f" in alg_list else alg_list[0]
 spx = __import__("pyspx.{}".format(default_alg), fromlist=[None])
-
+def spxload(name):
+    return __import__("pyspx.{}".format(name), fromlist=[None])
 class SPHApp():
     def __init__(self):
         self.pk = None
         self.sk = None
         self.server = Server()
-
     async def server_run(self, bootstrap_nodes, port=8470):
         await self.server.listen(port)
         await self.server.bootstrap(bootstrap_nodes)
@@ -80,7 +80,7 @@ class SPHApp():
     @staticmethod
     def make_key_bundle(pkey, alg, name):
         return {"pkey": base64.b64encode(pkey).decode(), "alg": alg, "name": name}
-
+    
     @staticmethod
     def change_alg(name):
         global spx

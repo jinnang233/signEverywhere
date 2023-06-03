@@ -48,7 +48,11 @@ def verify_func(args, app):
 
 def main():
     app = SPHApp()
+    alg_list = app.alglist()
+    default_alg = app.get_default_alg()
+    
     parser = argparse.ArgumentParser()
+    alg_choices="|".join(alg_list)
     parser.description = "sign or verify file with SPHINCS+"
     parser.set_defaults(func=default_func)
 
@@ -67,8 +71,19 @@ def main():
     verify_parser.add_argument("infile", metavar="infile", help="input file to be signed", type=argparse.FileType('rb'))
     verify_parser.add_argument("sig", metavar="signature_file", help="signature file",type=argparse.FileType('rb'))
     verify_parser.add_argument("pk", metavar="public_key_string", help="public key")
+    parser.add_argument(
+        "--algorithm",
+        metavar="algorithm",
+        help=f"choose algorithm: {alg_choices}, default: {default_alg}",
+        default=default_alg,
+        choices=alg_list
+    )
 
     args = parser.parse_args()
+    # 设置算法
+    if args.algorithm != default_alg:
+        app.change_alg(args.algorithm)
+
     if hasattr(args, "func"):
         args.func(args, app)
 
