@@ -57,7 +57,7 @@ sign_everywhere verify infile.txt signature.txt public_key
 
 - Run the Key server:
 ```
-sign_everywhere  --bootstrap node1 node2 node3 [options]
+sign_everywhere  --bootstrap node1 node2 node3 --run-forever
 ```
 
 
