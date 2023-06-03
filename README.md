@@ -11,6 +11,7 @@ git clone https://github.com/jinnang233/signEverywhere.git
 
 2. Install the signEverywhere:
 ```
+cd signEverywhere
 pip install -r requirements.txt
 python setup.py install
 ```
@@ -44,19 +45,18 @@ sign_everywhere [command] [options]
 - Sign a file:
 
 ```
-python main.py sign infile.txt --out signed_file.txt --password mypassword
+sign_everywhere sign infile.txt --out signed_file.txt --password mypassword
 ```
 
 
 - Verify the signature of a file:
-```
-python main.py verify infile.txt signature.txt public_key
+sign_everywhere verify infile.txt signature.txt public_key
 ```
 
 
 - Run the Key server:
 ```
-python main.py  --bootstrap node1 node2 node3 [options]
+sign_everywhere  --bootstrap node1 node2 node3 [options]
 ```
 
 
@@ -65,6 +65,12 @@ python main.py  --bootstrap node1 node2 node3 [options]
 
 Contributions are welcome! If you find any issues or have suggestions for improvements, please open an issue or submit a pull request.
 
+## Note
+
+This program has been rewritten by ChatGPT, but my abilities are limited, and I cannot guarantee that the program is bug-free. Feel free to fork this repository and make contributions.
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
+
+
