@@ -50,6 +50,7 @@ sign_everywhere sign infile.txt --out signed_file.txt --password mypassword
 
 
 - Verify the signature of a file:
+```
 sign_everywhere verify infile.txt signature.txt public_key
 ```
 
