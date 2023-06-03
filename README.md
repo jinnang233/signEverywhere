@@ -1,6 +1,6 @@
 # signEverywhere
 
-signEverywhere is a command-line tool for signing and verifying files using the SPHINCS+ signature scheme. It is an unofficial frontend for the PySPX library.
+signEverywhere is a command-line tool for signing and verifying files using the SPHINCS+ signature scheme. It is an **unofficial** frontend for the PySPX library.
 
 ## Installation
 
@@ -26,19 +26,21 @@ sign_everywhere [command] [options]
 
 - `sign`: Sign a file with a private key.
 - `verify`: Verify the signature of a file.
+- `share-key`: Share public key
+- `fetch-key`: Fetch a public key by key ID
 
 ### Options
 
 - `infile`: Input file to be signed or verified.
 - `--out`: Output file for the signed file (only applicable for the `sign` command).
 - `--password`: Password for the private key (required for the `sign` command).
-- `--namespace`: Namespace for key derivation (default: "default_namespace").
-- `--counter`: Counter for key derivation (default: 0).
+- `--namespace`: Namespace for key derivation (default: *default_namespace*).
+- `--counter`: Counter for key derivation (default: *0*).
 - `--showpk`: Show the public key after signing (only applicable for the `sign` command).
-- `--algorithm`: Specify the SPHINCS+ algorithm to use (default: "default_algorithm").
-- `--bootstrap`: Bootstrap nodes for the Kademlia network (required for the `run` command).
-- `--port`: Port number for the Kademlia network (default: 8470).
-- `--run-forever`: Keep the Kademlia server running indefinitely (only applicable for the `run` command).
+- `--algorithm`: Specify the SPHINCS+ algorithm to use (default: *shake_256f*).
+- `--bootstrap`: Bootstrap nodes for the Kademlia network.
+- `--port`: Port number for the Kademlia network (default: *8470*).
+- `--run-forever`: Keep the Kademlia server running indefinitely.
 
 ### Examples
 
@@ -57,10 +59,31 @@ sign_everywhere verify infile.txt signature.txt public_key
 
 - Run the Key server:
 ```
-sign_everywhere  --bootstrap node1 node2 node3 --run-forever
+sign_everywhere  [ --bootstrap=node1,node2,node3 ] --run-forever
+```
+
+- Publish Public Key  ( Take local key server as an example )
+```
+sign_everywhere --port 8471 --bootstrap="127.0.0.1:8470" share-key [public_key] [yourname]
+```
+Result: 
+```
+Public Key ID: [keyid]
+Fingerprint: [fingerprint]
+Public Key: [public_key]
 ```
 
 
+- Fetch Public Key  ( Take local key server as an example )
+```
+sign_everywhere --port 8471 --bootstrap="127.0.0.1:8470" fetch-key [keyid]
+```
+Result: 
+```
+Key ID: [keyid]
+Key Bundle: {'pkey': '[public_key]', 'alg': '[alg]', 'name': '[yourname]'}
+Fingerprint: [fingerprint]
+```
 
 ## Contributing
 
@@ -68,7 +91,7 @@ Contributions are welcome! If you find any issues or have suggestions for improv
 
 ## Note
 
-This program has been rewritten by ChatGPT, but my abilities are limited, and I cannot guarantee that the program is bug-free. Feel free to fork this repository and make contributions.
+This program has been **fully rewritten** by ChatGPT, because my abilities are limited, and I **cannot** guarantee that the program is bug-free. Feel free to fork this repository and make contributions.
 
 ## License
 
