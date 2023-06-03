@@ -1,7 +1,7 @@
 from setuptools import setup,find_packages
 
 setup(name="signEverywhere",
-        version="0.2.0-1alpha",
+        version="0.2.0.2",
         description="Sign and verify file everywhere",
         packages=["signEverywhere"],
         install_requires=["argon2","cffi","pycparser","PySPX","kademlia"],
