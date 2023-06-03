@@ -5,15 +5,15 @@ signEverywhere is a command-line tool for signing and verifying files using the 
 ## Installation
 
 1. Clone the signEverywhere repository:
-
-git clone https://github.com/your-username/signEverywhere.git
-
+```
+git clone https://github.com/jinnang233/signEverywhere.git
+```
 
 2. Install the signEverywhere:
-
+```
 pip install -r requirements.txt
 python setup.py install
-
+```
 
 ## Usage
 
