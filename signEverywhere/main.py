@@ -12,14 +12,11 @@ def sign_func(args, app):
     outfile = args.out
     password = args.password
 
-    # Read the input file
-    data = infile.read()
-
     # Derive the public key
     pk = derive(args, app)
 
     # Sign the data
-    signature = app.sign(data)
+    signature = app.sign_file(infile.name)
 
     # Write the signature to the output file or stdout
     if outfile:
@@ -35,12 +32,10 @@ def verify_func(args, app):
     pk = args.pk
 
     # Read the input file and signature
-    data = infile.read()
     signature = sigfile.read()
 
     # Verify the signature using the public key
-    result = app.verify(data, signature, base64.b64decode(pk))
-
+    result = app.verify_file(infile.name,signature,base64.b64decode(pk))
     # Print the verification result
     if result:
         print("Signature is valid.")
